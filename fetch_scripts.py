@@ -17,7 +17,6 @@ def uniprot_search(query, taxonomy_id, size=100):
         if not results:
             return {"error": "No protein data found for the given query."}
         
-        print(f"total results number = {len(results)}")
         return results
     else:
         return print({
@@ -26,6 +25,8 @@ def uniprot_search(query, taxonomy_id, size=100):
         })
 
 def parse_data(results, organism_:str, keywords_list:list):
+    
+    banwords_list = ['transferase','demethylase']
     parsed_data = []
 
     for entry in results:
@@ -38,13 +39,15 @@ def parse_data(results, organism_:str, keywords_list:list):
         parse_flag = True
         if (organism_ not in organism): parse_flag=False
         for keyword in keywords_list:
-            if (keyword not in annotation): parse_flag=False
+            if (keyword.lower() not in annotation.lower()): parse_flag=False
+        for banword in banwords_list:
+            if (banword in annotation): parse_flag=False
         if (parse_flag):
             parsed_data.append({
                 "ID": protein_id,
                 "Annotation": annotation,
-                "Sequence": sequence,
-                "Organism": organism
+                "Organism": organism,
+                "Sequence": sequence
             })
 
     return parsed_data
